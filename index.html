@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>チェスボードジェネレーター</title>
+  <meta name="theme-color" content="#4f46e5">
+  <link rel="manifest" href="/manifest.json">
+  <script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="/index.css">
+</head>
+<body class="bg-gray-100">
+  <div id="root">
+    <div class="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-4">
+      <div class="w-full max-w-4xl mx-auto bg-white rounded-xl shadow-lg">
+        <header class="bg-indigo-600 text-white p-6 rounded-t-xl">
+          <h1 class="text-2xl md:text-3xl font-bold text-center">チェスボードジェネレーター</h1>
+          <p class="text-center text-indigo-200 mt-1">カスタムサイズのチェスボードを作成して保存します</p>
+        </header>
+
+        <main class="p-6 md:p-8 flex flex-col lg:flex-row gap-8">
+          <div class="lg:w-1/3 space-y-6">
+            <h2 class="text-xl font-semibold text-gray-800 border-b pb-2">設定</h2>
+            
+            <!-- 縦マス数 -->
+            <div class="flex flex-col">
+              <label for="rows" class="mb-1 text-sm font-medium text-gray-700">縦マス数</label>
+              <input id="rows" type="number" value="8" min="1" max="100" class="px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition">
+            </div>
+
+            <!-- 横マス数 -->
+            <div class="flex flex-col">
+              <label for="cols" class="mb-1 text-sm font-medium text-gray-700">横マス数</label>
+              <input id="cols" type="number" value="8" min="1" max="100" class="px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition">
+            </div>
+
+            <div class="space-y-4 pt-2">
+              <!-- 横軸の表示位置 -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">横軸の表示位置</label>
+                <div id="xaxis-group" class="flex rounded-md shadow-sm">
+                  <label data-group="xaxis" data-value="top" class="relative inline-flex items-center justify-center px-3 py-2 text-sm font-medium focus:z-10 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 cursor-pointer border border-gray-300 transition-colors duration-150 ease-in-out w-full rounded-l-md bg-indigo-600 text-white border-indigo-600">
+                    <input type="radio" name="xaxis" value="top" class="sr-only" checked>上
+                  </label>
+                  <label data-group="xaxis" data-value="bottom" class="relative inline-flex items-center justify-center px-3 py-2 text-sm font-medium focus:z-10 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 cursor-pointer border border-gray-300 transition-colors duration-150 ease-in-out w-full -ml-px bg-white text-gray-700 hover:bg-gray-50">
+                    <input type="radio" name="xaxis" value="bottom" class="sr-only">下
+                  </label>
+                  <label data-group="xaxis" data-value="none" class="relative inline-flex items-center justify-center px-3 py-2 text-sm font-medium focus:z-10 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 cursor-pointer border border-gray-300 transition-colors duration-150 ease-in-out w-full -ml-px rounded-r-md bg-white text-gray-700 hover:bg-gray-50">
+                    <input type="radio" name="xaxis" value="none" class="sr-only">なし
+                  </label>
+                </div>
+              </div>
+              <!-- 縦軸の表示位置 -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">縦軸の表示位置</label>
+                <div id="yaxis-group" class="flex rounded-md shadow-sm">
+                  <label data-group="yaxis" data-value="left" class="relative inline-flex items-center justify-center px-3 py-2 text-sm font-medium focus:z-10 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 cursor-pointer border border-gray-300 transition-colors duration-150 ease-in-out w-full rounded-l-md bg-indigo-600 text-white border-indigo-600">
+                    <input type="radio" name="yaxis" value="left" class="sr-only" checked>左
+                  </label>
+                  <label data-group="yaxis" data-value="right" class="relative inline-flex items-center justify-center px-3 py-2 text-sm font-medium focus:z-10 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 cursor-pointer border border-gray-300 transition-colors duration-150 ease-in-out w-full -ml-px bg-white text-gray-700 hover:bg-gray-50">
+                    <input type="radio" name="yaxis" value="right" class="sr-only">右
+                  </label>
+                  <label data-group="yaxis" data-value="none" class="relative inline-flex items-center justify-center px-3 py-2 text-sm font-medium focus:z-10 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 cursor-pointer border border-gray-300 transition-colors duration-150 ease-in-out w-full -ml-px rounded-r-md bg-white text-gray-700 hover:bg-gray-50">
+                    <input type="radio" name="yaxis" value="none" class="sr-only">なし
+                  </label>
+                </div>
+              </div>
+            </div>
+             <!-- マスの形状 -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">マスの形状</label>
+              <div class="grid grid-cols-3 gap-3">
+                <label for="shape-square" data-shape="square" class="relative p-3 border rounded-lg cursor-pointer transition-all flex flex-col items-center justify-center text-center border-indigo-600 bg-indigo-50 ring-2 ring-indigo-500">
+                  <input id="shape-square" name="shape-type" type="radio" value="square" class="sr-only" checked>
+                  <svg class="w-10 h-10 text-indigo-600" viewBox="0 0 24 24" fill="currentColor"><path d="M3 3h18v18H3z"></path></svg>
+                  <span class="text-sm font-medium text-gray-800 mt-1">四角形</span>
+                </label>
+                <label for="shape-hexagon" data-shape="hexagon" class="relative p-3 border rounded-lg cursor-pointer transition-all flex flex-col items-center justify-center text-center border-gray-200 bg-white hover:border-indigo-400">
+                  <input id="shape-hexagon" name="shape-type" type="radio" value="hexagon" class="sr-only">
+                  <svg class="w-10 h-10 text-gray-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L21 7V17L12 22L3 17V7L12 2Z"></path></svg>
+                  <span class="text-sm font-medium text-gray-800 mt-1">正六角形</span>
+                </label>
+                <label for="shape-octagon" data-shape="octagon" class="relative p-3 border rounded-lg cursor-pointer transition-all flex flex-col items-center justify-center text-center border-gray-200 bg-white hover:border-indigo-400">
+                  <input id="shape-octagon" name="shape-type" type="radio" value="octagon" class="sr-only">
+                  <svg class="w-10 h-10 text-gray-400" viewBox="0 0 24 24" fill="currentColor"><path d="M6 2 L18 2 L22 6 L22 18 L18 22 L6 22 L2 18 L2 6 Z"></path></svg>
+                  <span class="text-sm font-medium text-gray-800 mt-1">角落とし四角形</span>
+                </label>
+              </div>
+            </div>
+             <!-- 枠線 -->
+            <div id="border-controls" class="border-t pt-4 space-y-4">
+              <div class="flex items-center">
+                <input id="showBorders" type="checkbox" checked class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                <label for="showBorders" class="ml-3 text-sm font-medium text-gray-700 select-none cursor-pointer">枠線を表示</label>
+              </div>
+              <div id="border-settings">
+                <div class="flex flex-col space-y-2">
+                  <label for="borderColor" class="text-sm font-medium text-gray-700">枠線の色</label>
+                  <div class="flex items-center gap-2">
+                    <input id="borderColor-picker" type="color" value="#333333" class="w-10 h-10 p-1 border border-gray-300 rounded-md cursor-pointer">
+                    <input id="borderColor" type="text" value="#333333" class="px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition w-full">
+                  </div>
+                </div>
+                <div class="flex flex-col mt-4">
+                  <label for="borderWidth" class="mb-1 text-sm font-medium text-gray-700">枠線の太さ (px)</label>
+                  <input id="borderWidth" type="number" value="2" min="0" max="50" class="px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition">
+                </div>
+              </div>
+            </div>
+            <!-- 色設定 -->
+            <div class="border-t pt-4 space-y-4">
+              <!-- 淡色マス -->
+              <div class="flex flex-col space-y-2">
+                <label for="lightColor" class="text-sm font-medium text-gray-700">淡色マスの色</label>
+                <div class="flex items-center gap-2">
+                  <input id="lightColor-picker" type="color" value="#FFFFFF" class="w-10 h-10 p-1 border border-gray-300 rounded-md cursor-pointer">
+                  <input id="lightColor" type="text" value="#FFFFFF" class="px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition w-full">
+                </div>
+                <div class="flex flex-col">
+                  <label for="lightColor-opacity" class="text-xs font-medium text-gray-600">不透明度: 100%</label>
+                  <input id="lightColor-opacity" type="range" min="0" max="1" step="0.01" value="1" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                </div>
+              </div>
+              <!-- 濃色マス -->
+              <div class="flex flex-col space-y-2">
+                <label for="darkColor" class="text-sm font-medium text-gray-700">濃色マスの色</label>
+                <div class="flex items-center gap-2">
+                  <input id="darkColor-picker" type="color" value="#000000" class="w-10 h-10 p-1 border border-gray-300 rounded-md cursor-pointer">
+                  <input id="darkColor" type="text" value="#000000" class="px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition w-full">
+                </div>
+                <div class="flex flex-col">
+                  <label for="darkColor-opacity" class="text-xs font-medium text-gray-600">不透明度: 100%</label>
+                  <input id="darkColor-opacity" type="range" min="0" max="1" step="0.01" value="1" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                </div>
+              </div>
+            </div>
+            <!-- ファイル名 -->
+            <div class="flex flex-col">
+              <label for="fileName" class="mb-1 text-sm font-medium text-gray-700">ファイル名</label>
+              <input id="fileName" type="text" value="chessboard" class="px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition">
+            </div>
+            <!-- 保存ボタン -->
+            <div class="flex flex-col space-y-3 pt-4">
+              <button id="savePng" class="w-full bg-green-500 text-white font-bold py-3 px-4 rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:bg-gray-400 disabled:cursor-not-allowed disabled:transform-none transition-transform transform hover:scale-105">
+                PNG形式で保存
+              </button>
+              <button id="saveJpeg" class="w-full bg-blue-500 text-white font-bold py-3 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-gray-400 disabled:cursor-not-allowed disabled:transform-none transition-transform transform hover:scale-105">
+                JPEG形式で保存
+              </button>
+            </div>
+          </div>
+
+          <div class="lg:w-2/3 flex items-center justify-center bg-gray-50 p-4 rounded-lg border-2 border-dashed border-gray-300">
+            <div class="relative w-full h-full flex items-center justify-center">
+              <canvas id="canvas" class="max-w-full max-h-full" style="image-rendering: pixelated;"></canvas>
+            </div>
+          </div>
+        </main>
+      </div>
+      <footer class="text-center mt-8 text-gray-500 text-sm">
+        <p>Copyright &copy; <span id="year"></span> Chessboard Generator. All rights reserved.</p>
+      </footer>
+    </div>
+  </div>
+
+  <script type="module">
+    document.addEventListener('DOMContentLoaded', () => {
+      const getEl = (id) => document.getElementById(id);
+
+      const state = {
+        rows: 8,
+        cols: 8,
+        lightColor: '#FFFFFF',
+        darkColor: '#000000',
+        lightColorOpacity: 1,
+        darkColorOpacity: 1,
+        fileName: 'chessboard',
+        xAxisPosition: 'top',
+        yAxisPosition: 'left',
+        shape: 'square',
+        showBorders: true,
+        borderColor: '#333333',
+        borderWidth: 2,
+      };
+
+      const canvas = getEl('canvas');
+      const ctx = canvas.getContext('2d');
+
+      const hexToRgba = (hex, alpha) => {
+        hex = hex.replace('#', '');
+        if (hex.length === 3) {
+          hex = hex.split('').map(char => char + char).join('');
+        }
+        const r = parseInt(hex.substring(0, 2), 16);
+        const g = parseInt(hex.substring(2, 4), 16);
+        const b = parseInt(hex.substring(4, 6), 16);
+        return isNaN(r) || isNaN(g) || isNaN(b) ? `rgba(0, 0, 0, ${alpha})` : `rgba(${r}, ${g}, ${b}, ${alpha})`;
+      };
+
+      const getColumnLabel = (colIndex) => {
+        let label = '';
+        let num = colIndex;
+        do {
+          label = String.fromCharCode(65 + (num % 26)) + label;
+          num = Math.floor(num / 26) - 1;
+        } while (num >= 0);
+        return label;
+      };
+
+      const generateChessboard = () => {
+        if (!canvas || !ctx) return;
+        
+        const TARGET_LONGER_SIDE = 1024;
+
+        // --- 1. Define base unit sizes for ratio calculation ---
+        const BASE_SQUARE_SIZE = 100;
+        const BASE_HEX_RADIUS = 50;
+        const BASE_PADDING = 50;
+        const BASE_FONT_SIZE = 20;
+
+        // --- 2. Calculate ideal (unscaled) dimensions of the board and padding ---
+        let idealBoardWidth, idealBoardHeight;
+        if (state.shape === 'hexagon') {
+            const hexWidth = Math.sqrt(3) * BASE_HEX_RADIUS;
+            const hexHeight = 2 * BASE_HEX_RADIUS;
+            idealBoardWidth = state.cols * hexWidth + hexWidth / 2;
+            idealBoardHeight = state.rows * hexHeight * 0.75 + hexHeight * 0.25;
+        } else { // square or octagon
+            idealBoardWidth = state.cols * BASE_SQUARE_SIZE;
+            idealBoardHeight = state.rows * BASE_SQUARE_SIZE;
+        }
+
+        const idealPaddingTop = state.xAxisPosition === 'top' ? BASE_PADDING : 0;
+        const idealPaddingBottom = state.xAxisPosition === 'bottom' ? BASE_PADDING : 0;
+        const idealPaddingLeft = state.yAxisPosition === 'left' ? BASE_PADDING : 0;
+        const idealPaddingRight = state.yAxisPosition === 'right' ? BASE_PADDING : 0;
+
+        // --- 3. Calculate total ideal dimensions ---
+        const idealTotalWidth = idealBoardWidth + idealPaddingLeft + idealPaddingRight;
+        const idealTotalHeight = idealBoardHeight + idealPaddingTop + idealPaddingBottom;
+
+        // --- 4. Calculate final canvas dimensions, ensuring longer side is exactly 1024 ---
+        if (idealTotalWidth >= idealTotalHeight) {
+            canvas.width = TARGET_LONGER_SIDE;
+            canvas.height = Math.round(TARGET_LONGER_SIDE * (idealTotalHeight / idealTotalWidth));
+        } else {
+            canvas.height = TARGET_LONGER_SIDE;
+            canvas.width = Math.round(TARGET_LONGER_SIDE * (idealTotalWidth / idealTotalHeight));
+        }
+
+        // --- 5. Recalculate the actual scale factor based on the final canvas size ---
+        const scaleFactor = canvas.width / idealTotalWidth;
+        
+        // --- 6. Calculate final, scaled dimensions for all elements ---
+        const PADDING_TOP = idealPaddingTop * scaleFactor;
+        const PADDING_BOTTOM = idealPaddingBottom * scaleFactor;
+        const PADDING_LEFT = idealPaddingLeft * scaleFactor;
+        const PADDING_RIGHT = idealPaddingRight * scaleFactor;
+        const FONT_SIZE = BASE_FONT_SIZE * scaleFactor;
+        const BORDER_WIDTH = (state.showBorders && state.borderWidth > 0) ? state.borderWidth * scaleFactor : 0;
+
+        const boardWidth = idealBoardWidth * scaleFactor;
+        const boardHeight = idealBoardHeight * scaleFactor;
+        const boardStartX = PADDING_LEFT;
+        const boardStartY = PADDING_TOP;
+            
+        const finalLightColor = hexToRgba(state.lightColor, state.lightColorOpacity);
+        const finalDarkColor = hexToRgba(state.darkColor, state.darkColorOpacity);
+
+        // --- 7. Start Drawing ---
+        ctx.fillStyle = '#f0f0f0';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.fillStyle = '#333';
+        ctx.font = `${FONT_SIZE}px sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+
+        // --- 8. Draw based on shape ---
+        if (state.shape === 'square') {
+            const SQUARE_SIZE = BASE_SQUARE_SIZE * scaleFactor;
+            
+            if (state.xAxisPosition !== 'none') {
+                const yPos = state.xAxisPosition === 'top' ? PADDING_TOP / 2 : boardStartY + boardHeight + PADDING_BOTTOM / 2;
+                for (let c = 0; c < state.cols; c++) {
+                    ctx.fillText(getColumnLabel(c), boardStartX + c * SQUARE_SIZE + SQUARE_SIZE / 2, yPos);
+                }
+            }
+            if (state.yAxisPosition !== 'none') {
+                const xPos = state.yAxisPosition === 'left' ? PADDING_LEFT / 2 : boardStartX + boardWidth + PADDING_RIGHT / 2;
+                for (let r = 0; r < state.rows; r++) {
+                    ctx.fillText(String(r + 1), xPos, boardStartY + r * SQUARE_SIZE + SQUARE_SIZE / 2);
+                }
+            }
+
+            for (let r = 0; r < state.rows; r++) {
+                for (let c = 0; c < state.cols; c++) {
+                    ctx.fillStyle = (r + c) % 2 === 0 ? finalLightColor : finalDarkColor;
+                    const x = boardStartX + c * SQUARE_SIZE;
+                    const y = boardStartY + r * SQUARE_SIZE;
+                    ctx.fillRect(x, y, SQUARE_SIZE, SQUARE_SIZE);
+                    
+                    if (BORDER_WIDTH > 0) {
+                        ctx.strokeStyle = state.borderColor;
+                        ctx.lineWidth = BORDER_WIDTH;
+                        ctx.strokeRect(x, y, SQUARE_SIZE, SQUARE_SIZE);
+                    }
+                }
+            }
+        } else if (state.shape === 'hexagon') {
+            const HEX_RADIUS = BASE_HEX_RADIUS * scaleFactor;
+            const hexWidth = Math.sqrt(3) * HEX_RADIUS;
+            const hexHeight = 2 * HEX_RADIUS;
+
+            if (state.xAxisPosition !== 'none') {
+                const yPos = state.xAxisPosition === 'top' ? PADDING_TOP / 2 : boardStartY + boardHeight + PADDING_BOTTOM / 2;
+                for (let c = 0; c < state.cols; c++) {
+                    const cx = boardStartX + c * hexWidth + hexWidth / 2;
+                    ctx.fillText(getColumnLabel(c), cx, yPos);
+                }
+            }
+            if (state.yAxisPosition !== 'none') {
+                const xPos = state.yAxisPosition === 'left' ? PADDING_LEFT / 2 : boardStartX + boardWidth + PADDING_RIGHT / 2;
+                for (let r = 0; r < state.rows; r++) {
+                    const cy = boardStartY + r * (hexHeight * 0.75) + hexHeight / 2;
+                    ctx.fillText(String(r + 1), xPos, cy);
+                }
+            }
+            
+            ctx.save();
+            ctx.beginPath();
+            ctx.rect(boardStartX, boardStartY, boardWidth, boardHeight);
+            ctx.clip();
+            
+            const drawHexagon = (x, y) => {
+                ctx.beginPath();
+                for (let i = 0; i < 6; i++) {
+                    const angle = (Math.PI / 3) * i + (Math.PI / 6);
+                    const vx = x + HEX_RADIUS * Math.cos(angle);
+                    const vy = y + HEX_RADIUS * Math.sin(angle);
+                    if (i === 0) ctx.moveTo(vx, vy); else ctx.lineTo(vx, vy);
+                }
+                ctx.closePath();
+            };
+            
+            for (let r = -1; r < state.rows + 1; r++) {
+                for (let c = -1; c < state.cols + 2; c++) {
+                    let cx = boardStartX + c * hexWidth + hexWidth / 2;
+                    if (r % 2 !== 0) cx += hexWidth / 2; // Stagger odd rows
+                    const cy = boardStartY + r * (hexHeight * 0.75) + hexHeight / 2;
+
+                    if (cx + HEX_RADIUS < boardStartX || cx - HEX_RADIUS > boardStartX + boardWidth ||
+                        cy + HEX_RADIUS < boardStartY || cy - HEX_RADIUS > boardStartY + boardHeight) {
+                        continue;
+                    }
+
+                    drawHexagon(cx, cy);
+                    
+                    ctx.fillStyle = (r + c) % 2 === 0 ? finalLightColor : finalDarkColor;
+                    ctx.fill();
+
+                    if (BORDER_WIDTH > 0) {
+                        ctx.strokeStyle = state.borderColor;
+                        ctx.lineWidth = BORDER_WIDTH;
+                        ctx.stroke();
+                    }
+                }
+            }
+
+            ctx.restore();
+            
+            if (BORDER_WIDTH > 0) {
+                ctx.strokeStyle = state.borderColor;
+                ctx.lineWidth = BORDER_WIDTH;
+                ctx.strokeRect(boardStartX, boardStartY, boardWidth, boardHeight);
+            }
+
+        } else { // octagon
+            const SQUARE_SIZE = BASE_SQUARE_SIZE * scaleFactor;
+
+            if (state.xAxisPosition !== 'none') {
+                const yPos = state.xAxisPosition === 'top' ? PADDING_TOP / 2 : boardStartY + boardHeight + PADDING_BOTTOM / 2;
+                for (let c = 0; c < state.cols; c++) {
+                    ctx.fillText(getColumnLabel(c), boardStartX + c * SQUARE_SIZE + SQUARE_SIZE / 2, yPos);
+                }
+            }
+            if (state.yAxisPosition !== 'none') {
+                const xPos = state.yAxisPosition === 'left' ? PADDING_LEFT / 2 : boardStartX + boardWidth + PADDING_RIGHT / 2;
+                for (let r = 0; r < state.rows; r++) {
+                    ctx.fillText(String(r + 1), xPos, boardStartY + r * SQUARE_SIZE + SQUARE_SIZE / 2);
+                }
+            }
+
+            ctx.fillStyle = state.borderColor; 
+            ctx.fillRect(boardStartX, boardStartY, boardWidth, boardHeight);
+            
+            const cornerCut = SQUARE_SIZE / 16; 
+
+            for (let r = 0; r < state.rows; r++) {
+                for (let c = 0; c < state.cols; c++) {
+                    const x = boardStartX + c * SQUARE_SIZE;
+                    const y = boardStartY + r * SQUARE_SIZE;
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(x + cornerCut, y);
+                    ctx.lineTo(x + SQUARE_SIZE - cornerCut, y);
+                    ctx.lineTo(x + SQUARE_SIZE, y + cornerCut);
+                    ctx.lineTo(x + SQUARE_SIZE, y + SQUARE_SIZE - cornerCut);
+                    ctx.lineTo(x + SQUARE_SIZE - cornerCut, y + SQUARE_SIZE);
+                    ctx.lineTo(x + cornerCut, y + SQUARE_SIZE);
+                    ctx.lineTo(x, y + SQUARE_SIZE - cornerCut);
+                    ctx.lineTo(x, y + cornerCut);
+                    ctx.closePath();
+                    
+                    ctx.fillStyle = (r + c) % 2 === 0 ? finalLightColor : finalDarkColor;
+                    ctx.fill();
+
+                    if (BORDER_WIDTH > 0) {
+                        ctx.strokeStyle = state.borderColor;
+                        ctx.lineWidth = BORDER_WIDTH;
+                        ctx.stroke();
+                    }
+                }
+            }
+        }
+        
+        getEl('savePng').disabled = false;
+        getEl('saveJpeg').disabled = false;
+      };
+      
+      const setupEventListeners = () => {
+        getEl('rows').addEventListener('input', e => {
+            state.rows = Math.max(1, Math.min(100, parseInt(e.target.value, 10) || 1));
+            generateChessboard();
+        });
+        getEl('cols').addEventListener('input', e => {
+            state.cols = Math.max(1, Math.min(100, parseInt(e.target.value, 10) || 1));
+            generateChessboard();
+        });
+        getEl('fileName').addEventListener('input', e => {
+            state.fileName = e.target.value;
+        });
+        
+        // Radio Pill Style Handler
+        const handleRadioPill = (group, value) => {
+          document.querySelectorAll(`[data-group="${group}"]`).forEach(label => {
+            const isChecked = label.dataset.value === value;
+            label.classList.toggle('bg-indigo-600', isChecked);
+            label.classList.toggle('text-white', isChecked);
+            label.classList.toggle('border-indigo-600', isChecked);
+            label.classList.toggle('bg-white', !isChecked);
+            label.classList.toggle('text-gray-700', !isChecked);
+            label.classList.toggle('hover:bg-gray-50', !isChecked);
+          });
+        };
+        
+        // Axis position controls
+        document.querySelectorAll('[data-group="xaxis"], [data-group="yaxis"]').forEach(label => {
+          label.addEventListener('click', () => {
+            const group = label.dataset.group;
+            const value = label.dataset.value;
+            
+            // Update state
+            const stateKey = group === 'xaxis' ? 'xAxisPosition' : 'yAxisPosition';
+            state[stateKey] = value;
+            
+            // Update hidden radio button
+            const radioInput = label.querySelector('input[type="radio"]');
+            if (radioInput) {
+              radioInput.checked = true;
+            }
+            
+            // Update UI styles
+            handleRadioPill(group, value);
+            
+            // Redraw the board
+            generateChessboard();
+          });
+        });
+        
+        // Shape Selector
+        const shapeLabels = document.querySelectorAll('label[data-shape]');
+        shapeLabels.forEach(label => {
+            label.addEventListener('click', () => {
+                const shapeValue = label.dataset.shape;
+                state.shape = shapeValue;
+                
+                shapeLabels.forEach(l => {
+                    const isSelected = l.dataset.shape === shapeValue;
+                    l.classList.toggle('border-indigo-600', isSelected);
+                    l.classList.toggle('bg-indigo-50', isSelected);
+                    l.classList.toggle('ring-2', isSelected);
+                    l.classList.toggle('ring-indigo-500', isSelected);
+                    l.classList.toggle('border-gray-200', !isSelected);
+                    l.classList.toggle('bg-white', !isSelected);
+                    l.querySelector('svg').classList.toggle('text-indigo-600', isSelected);
+                    l.querySelector('svg').classList.toggle('text-gray-400', !isSelected);
+                });
+                
+                const showBordersCheckbox = getEl('showBorders');
+                const showBordersLabel = showBordersCheckbox.nextElementSibling;
+                if (shapeValue === 'octagon' || shapeValue === 'hexagon') {
+                    state.showBorders = true;
+                    showBordersCheckbox.checked = true;
+                    showBordersCheckbox.disabled = true;
+                    showBordersLabel.classList.add('cursor-not-allowed', 'text-gray-500');
+                    showBordersLabel.classList.remove('cursor-pointer');
+                } else {
+                    showBordersCheckbox.disabled = false;
+                     showBordersLabel.classList.remove('cursor-not-allowed', 'text-gray-500');
+                     showBordersLabel.classList.add('cursor-pointer');
+                }
+                toggleBorderSettings(state.showBorders);
+                generateChessboard();
+            });
+        });
+        
+        // Border controls
+        const toggleBorderSettings = (show) => {
+            getEl('border-settings').style.display = show ? 'block' : 'none';
+        };
+        getEl('showBorders').addEventListener('change', e => {
+            state.showBorders = e.target.checked;
+            toggleBorderSettings(state.showBorders);
+            generateChessboard();
+        });
+        getEl('borderColor').addEventListener('input', e => {
+            state.borderColor = e.target.value;
+            getEl('borderColor-picker').value = e.target.value;
+            generateChessboard();
+        });
+        getEl('borderColor-picker').addEventListener('input', e => {
+            state.borderColor = e.target.value;
+            getEl('borderColor').value = e.target.value;
+            generateChessboard();
+        });
+        getEl('borderWidth').addEventListener('input', e => {
+            state.borderWidth = Math.max(0, Math.min(50, parseInt(e.target.value, 10) || 0));
+            generateChessboard();
+        });
+
+        // Color and Opacity
+        ['light', 'dark'].forEach(type => {
+            const colorInput = getEl(`${type}Color`);
+            const colorPicker = getEl(`${type}Color-picker`);
+            const opacitySlider = getEl(`${type}Color-opacity`);
+            const opacityLabel = opacitySlider.previousElementSibling;
+
+            colorInput.addEventListener('input', e => {
+                state[`${type}Color`] = e.target.value;
+                colorPicker.value = e.target.value;
+                generateChessboard();
+            });
+            colorPicker.addEventListener('input', e => {
+                state[`${type}Color`] = e.target.value;
+                colorInput.value = e.target.value;
+                generateChessboard();
+            });
+            opacitySlider.addEventListener('input', e => {
+                const value = parseFloat(e.target.value);
+                state[`${type}ColorOpacity`] = value;
+                opacityLabel.textContent = `不透明度: ${Math.round(value * 100)}%`;
+                generateChessboard();
+            });
+        });
+
+        // Save buttons
+        getEl('savePng').addEventListener('click', () => {
+          const link = document.createElement('a');
+          link.href = canvas.toDataURL('image/png');
+          link.download = `${state.fileName.trim() || 'chessboard'}.png`;
+          link.click();
+        });
+        getEl('saveJpeg').addEventListener('click', () => {
+          const link = document.createElement('a');
+          const tempCanvas = document.createElement('canvas');
+          tempCanvas.width = canvas.width;
+          tempCanvas.height = canvas.height;
+          const tempCtx = tempCanvas.getContext('2d');
+          tempCtx.fillStyle = '#FFFFFF'; // Fill background with white for JPEG
+          tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+          tempCtx.drawImage(canvas, 0, 0);
+
+          link.href = tempCanvas.toDataURL('image/jpeg', 0.9);
+          link.download = `${state.fileName.trim() || 'chessboard'}.jpeg`;
+          link.click();
+        });
+      };
+      
+      const init = () => {
+        getEl('year').textContent = new Date().getFullYear();
+        setupEventListeners();
+        generateChessboard();
+      };
+
+      init();
+    });
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').then(registration => {
+          console.log('ServiceWorker registration successful with scope: ', registration.scope);
+        }).catch(err => {
+          console.log('ServiceWorker registration failed: ', err);
+        });
+      });
+    }
+  </script>
+<script type="module" src="/index.tsx"></script>
+</body>
+</html>
